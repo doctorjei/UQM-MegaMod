@@ -77,7 +77,7 @@ typedef enum
 //   however, IP runs at 30 fps right now. So in reality, the IP clock
 //   rate is closer to 23 seconds per game day. The clock is faster, but
 //   the flagship also moves faster.
-#define INTERPLANETARY_CLOCK_RATE 30
+#define INTERPLANETARY_CLOCK_RATE 120
 
 extern BOOLEAN InitGameClock (void);
 extern BOOLEAN UninitGameClock (void);

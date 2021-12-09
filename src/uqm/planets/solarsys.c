@@ -58,7 +58,7 @@
 //#define DEBUG_SOLARSYS
 //#define SMOOTH_SYSTEM_ZOOM  1
 
-#define IP_FRAME_RATE  (ONE_SECOND / 30)
+#define IP_FRAME_RATE  (ONE_SECOND / 120)
 
 // BW: those do not depend on the resolution because numbers too small
 // cause crashes in the generation and rendering
@@ -1426,23 +1426,22 @@ ProcessShipControls (void)
 			switch (cardinalDir)
 			{
 				case NORTH: facing = 0; break;
-				case EAST: facing = 4; break;
-				case SOUTH: facing = 8; break;
-				case WEST: facing = 12; break;
+				case EAST: facing = 32; break;
+				case SOUTH: facing = 64; break;
+				case WEST: facing = 96; break;
 				default: facing = frame_index; break;
 			}
 
 			if ((int)facing != frame_index)
 			{
-				if (NORMALIZE_FACING (frame_index - facing)
-					>= ANGLE_TO_FACING (HALF_CIRCLE))
+				if (((DWORD)(frame_index - facing) & 127) >= 64)
 				{
-					facing = NORMALIZE_FACING (facing - 1);
+					facing = (facing == 0 ? 127 : facing - 1);
 					delta_x++;
 				}
 				else if ((int)frame_index != (int)facing)
 				{
-					facing = NORMALIZE_FACING (facing + 1);
+					facing = (facing == 127 ? 0 : facing + 1);
 					delta_x--;
 				}
 			}
@@ -1463,9 +1462,9 @@ ProcessShipControls (void)
 	else if (delta_x)
 	{
 		if (delta_x < 0)
-			index = NORMALIZE_FACING (index - 1);
+			index = (DWORD) (index - 1) & 127;
 		else
-			index = NORMALIZE_FACING (index + 1);
+			index = (DWORD)(index + 1) & 127;
 
 		GLOBAL (ShipStamp.frame) =
 				SetAbsFrameIndex (GLOBAL (ShipStamp.frame), index);
@@ -1477,7 +1476,7 @@ ProcessShipControls (void)
 	else if (delta_y < 0)
 	{
 #define THRUST_WAIT 1
-		flagship_inertial_thrust (FACING_TO_ANGLE (index));
+		flagship_inertial_thrust (index / 2);
 
 		pSolarSysState->thrust_counter = THRUST_WAIT;
 	}
